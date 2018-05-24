@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8"/>
+        <title th:text="${status}"></title>
+        <th:block th:replace="fragments/includes :: styles"/>
+    </head>
+    <body>
+    <div class="medium-card-content">
+        <div class="form-card">
+            <div class="card red">
+                <div class="card-content red lighten-1 white-text center">
+                    <span class="card-title">Whoops. An error has occured</span>
+                </div>
+                <div class="card-content red lighten-5 center">
+                    <div class="row">
+                        <div class="col s12" th:if="${message != null}">
+                            <h2 th:text="${message}"></h2>
+                        </div>
+                        <div class="col s12" th:if="${message == null}">
+                            <h2 th:text="'This page has lost the will to work.'"></h2>
+                        </div>
+                        <div class="col s12" th:if="${status}">
+                            <span th:text="'Status: '+${status}"></span>
+                        </div>
+                    </div>
+                    <div class="container">
+                        <th:block th:replace="fragments/errors :: errorsBlock"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <th:block th:replace="fragments/includes :: scripts"></th:block>
+    </body>
+</html>

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+    </head>
+    <body>
+        <th:block th:fragment="errorsBlock">
+            <ul id="messages" th:with="notifyMessages=${session[T(jee.mif.bl.services.impl.NotificationServiceImpl).NOTIFY_MSG_SESSION_KEY]}">
+                <li th:each="msg : ${notifyMessages}" style="text-align: center">
+                    <div th:class="${#strings.toLowerCase(msg.type).equals('error')} ? 'card-panel red' : 'card-panel green'">
+                        <span th:text="${msg.text}"></span>
+                    </div>
+                </li>
+                <span th:if="${notifyMessages}" th:remove="all" th:text="${session.remove(T(jee.mif.bl.services.impl.NotificationServiceImpl).NOTIFY_MSG_SESSION_KEY)}"></span>
+            </ul>
+        </th:block>
+    </body>
+</html>

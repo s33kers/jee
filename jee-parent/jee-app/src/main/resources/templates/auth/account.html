@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Account settings</title>
+        <th:block th:replace="fragments/includes :: styles"/>
+    </head>
+    <body>
+        <nav th:replace="fragments/navbar :: navigation"></nav>
+        <th:block th:replace="fragments/errors :: errorsBlock"/>
+        <main>
+            <div class="container">
+                <div class="row">
+                    <div class="col m6">
+                        <div class="card blue">
+                            <div class="card-content white-text">
+                                <span class="card-title">Change Name or Surname</span>
+                            </div>
+                            <div class="card-content blue lighten-5">
+                                <form class="row" method="post" th:object="${user}" th:action="@{/auth/account/changeName/}">
+                                    <input type="hidden" th:field="${user.version}" id="version" name="version"/>
+                                    <div class="input-field col s12">
+                                        <input class="validate" type="text" name="name" id="name" th:field="${user.name}" th:maxlength="255"/>
+                                        <label for="name">Name</label>
+                                    </div>
+                                    <div class="input-field col s12">
+                                        <input class="validate" type="text" name="surname" id="surname" th:field="${user.surname}" th:maxlength="255"/>
+                                        <label for="surname">Surname</label>
+                                    </div>
+                                    <button type="submit" name="btn_login" class="col s12 btn btn-large waves-effect indigo">Submit</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col m6">
+                        <div class="card blue">
+                            <div class="card-content white-text">
+                                <span class="card-title">Change Password</span>
+                            </div>
+                            <div class="card-content blue lighten-5">
+                                <form class="row" method="post" th:object="${user}" th:action="@{/auth/account/changePassword/}">
+                                    <input type="hidden" th:field="${user.version}" id="version" name="version"/>
+                                    <div class="input-field col s12">
+                                        <input class="validate" type="password" name="oldpassword" id="oldpassword" th:field="${user.oldPassword}" th:maxlength="255"/>
+                                        <label for="oldpassword">Old password</label>
+                                    </div>
+                                    <div class="input-field col s12">
+                                        <input class="validate" type="password" name="password" id="password" th:field="${user.password}" th:maxlength="255"/>
+                                        <label for="password">New password</label>
+                                    </div>
+                                    <div class="input-field col s12">
+                                        <input class="validate" type="password" name="password2" id="password2" th:field="${user.passwordConfirm}" th:maxlength="255"
+                                               data-error="Passwords do not match"/>
+                                        <label for="password2">Password (Confirm)</label>
+                                    </div>
+                                    <button type="submit" name="btn_login" class="col s12 btn btn-large waves-effect indigo">Submit</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <th:block th:replace="fragments/includes :: scripts"></th:block>
+    </body>
+</html>

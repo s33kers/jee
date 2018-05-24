@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head>
+    <meta charset="UTF-8" />
+    <title>Survey statistics</title>
+    <th:block th:replace="fragments/includes :: styles"/>
+</head>
+<body>
+<div sec:authorize="isAuthenticated()">
+    <nav th:replace="fragments/navbar :: navigation"></nav>
+</div>
+
+<script type="text/javascript">
+    var pieCharts = [];
+</script>
+<main>
+    <div class="container">
+        <div class="card blue">
+            <div class="card-content blue lighten-1 white-text">
+                <span class="card-title">Statistics for survey: "<th:block th:text="${survey.title}"/>"</span>
+            </div>
+        </div>
+        <div th:if="${stats.isEmpty()}" class="card-panel red center">
+            No statistics available
+        </div>
+        <div class="card blue" th:each="s, statsIterator : ${stats}">
+            <div class="card-content blue lighten-1 white-text">
+                <span class="card-title" th:text="'Question #' + ${statsIterator.index + 1}"></span>
+            </div>
+            <div class="card-content grey lighten-5">
+                <div class="row">
+                    <div class="col s12">
+                        <span>Question:</span>
+                        <em th:text="${s.question}"></em>
+                    </div>
+                </div>
+                <hr />
+                <div class="row">
+                    <div class="col s12">
+                        <span>Answers:</span>
+                        <th:block th:switch="${s.questionType}">
+                            <th:block th:case="${T(jee.mif.model.survey.QuestionType).TEXT}">
+                                <ul class="collection scrollable-list">
+                                    <li class="collection-item"
+                                        th:each="a : ${s.questionStatisticsViewList}">
+                                        <span th:text="${a.answer}"></span>
+                                        <span class="badge" th:text="${a.answerCount}"></span>
+                                    </li>
+                                </ul>
+                            </th:block>
+                            <th:block th:case="${T(jee.mif.model.survey.QuestionType).MULTIPLECHOICE}">
+                                <ul class="collection pie-chart-data">
+                                    <li th:each="a : ${s.questionStatisticsViewList}"
+                                        class="collection-item chart-data"
+                                        th:text="${a.rate} + '% - ' + ${a.answer}"
+                                        th:attr="data-value=${a.rate}, data-title=${a.answer}"></li>
+                                </ul>
+                            </th:block>
+                            <th:block th:case="${T(jee.mif.model.survey.QuestionType).CHECKBOX}">
+                                <ul class="collection bar-chart-data">
+                                    <li th:each="a : ${s.questionStatisticsViewList}"
+                                        class="collection-item chart-data"
+                                        th:text="${a.rate} + '% - ' + ${a.answer}"
+                                        th:attr="data-value=${a.rate}, data-title=${a.answer}"></li>
+                                </ul>
+                            </th:block>
+                            <th:block th:case="${T(jee.mif.model.survey.QuestionType).SCALE}">
+                                <ul class="collection">
+                                    <li class="collection-item">Mean: <span th:text="${s.mean}"></span></li>
+                                    <li th:if="${s.mode != null and !T(Double).isNaN(s.mode)}" class="collection-item">Mode: <span th:text="${s.mode}"></span></li>
+                                    <li class="collection-item">Median: <span th:text="${s.median}"></span></li>
+                                </ul>
+                            </th:block>
+                        </th:block>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<th:block th:replace="fragments/includes :: scripts"></th:block>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Import survey</title>
+        <th:block th:replace="fragments/includes :: styles"/>
+    </head>
+    <body>
+    <nav th:replace="fragments/navbar :: navigation"></nav>
+    <th:block th:replace="fragments/errors :: errorsBlock"/>
+    <main>
+        <div class="medium-card-content">
+            <h2 class="center-align grey-text">Import XLSX</h2>
+            <div class="form-card">
+                <div class="z-depth-1 grey lighten-4 row form-container">
+                    <form class="col s12" method="post" enctype="multipart/form-data">
+                        <div class="file-field input-field col s12">
+                            <div class="btn">
+                                <span>Choose file</span>
+                                <input name="file" type="file" />
+                            </div>
+                            <div class="file-path-wrapper">
+                                <input class="file-path validate" name="file-path" type="text" />
+                            </div>
+                        </div>
+                        <button type="submit" name="btn_import" class="col s12 btn btn-large waves-effect indigo">Import</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <th:block th:replace="fragments/includes :: scripts"></th:block>
+    </body>
+</html>

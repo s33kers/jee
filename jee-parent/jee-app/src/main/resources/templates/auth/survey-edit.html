@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Edit survey</title>
+    <th:block th:replace="fragments/includes :: styles"/>
+</head>
+<body>
+<nav th:replace="fragments/navbar :: navigation"></nav>
+<th:block th:replace="fragments/errors :: errorsBlock"/>
+<main>
+    <form th:if="${survey.draft}" method="post" th:object="${survey}" th:action="@{/auth/survey-edit/save(survey-id=${survey.id}, page=${currentPageNumber})}">
+        <input type="hidden" th:field="${survey.version}" id="version" name="version"/>
+        <div class="container">
+            <th:block th:replace="fragments/survey :: surveySettings(survey=${survey})"/>
+            <th:block th:replace="fragments/survey :: surveyPaging(currentPage=${currentPage},currentPageNumber=${currentPageNumber},errorMessage=${errorMessage},totalPages=${totalPages},survey=${survey})"/>
+        </div>
+
+        <th:block th:if="${currentPage}">
+            <th:block th:each="question, questionIteration : ${currentPage.getQuestions()}">
+                <th:block th:replace="fragments/survey :: editQuestionFormPart(question=${question},index=${questionIteration.index},currentPage=${currentPage})"/>
+            </th:block>
+        </th:block>
+        <div class="container" id="add-buttons-container" th:if="${totalPages gt 0}">
+            <div>
+                <a class="submit-form-btn btn-floating green"
+                   data-formid="publish-form"
+                   th:href="@{/auth/survey-edit/publish(survey-id=${survey.id})}"
+                   data-toggle="tooltip" title="Publish survey">
+                    <i class="material-icons">publish</i>
+                </a>
+                <a class="submit-form-btn btn-floating red"
+                   data-formid="delete-survey-form"
+                   th:href="@{/auth/survey-edit/delete-survey(survey-id=${survey.id})}"
+                   data-toggle="tooltip" title="Delete survey"
+                   th:if="${canDelete}">
+                    <i class="material-icons">delete</i>
+                </a>
+                <div class="fixed-action-btn toolbar">
+                    <button type="submit" class="btn-floating indigo" title="Save survey changes">
+                        <i class="material-icons">save</i>
+                    </button>
+                    <a class="btn-floating green darken-4"
+                       data-toggle="tooltip" title="Add question">
+                        <i class="material-icons">add</i>
+                    </a>
+                    <ul>
+                        <li class="waves-effect waves-light">
+                            <a href="#!" id="add-text-question">Text</a>
+                        </li>
+                        <li class="waves-effect waves-light">
+                            <a href="#!" id="add-checkbox-question">Checkbox</a>
+                        </li>
+                        <li class="waves-effect waves-light">
+                            <a href="#!" id="add-multiplechoice-question">Radio</a>
+                        </li>
+                        <li class="waves-effect waves-light">
+                            <a href="#!" id="add-scale-question">Scale</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="survey-preview">
+        <th:block th:if="${!survey.draft}">
+            <div class="container">
+                <th:block th:replace="fragments/survey :: surveySettings(survey=${survey}, url=${url})"/>
+                <th:block th:if="${totalPages > 1}">
+                    <th:block th:replace="fragments/survey :: surveyPaging(currentPage=${currentPage},currentPageNumber=${currentPageNumber},errorMessage=${errorMessage},totalPages=${totalPages},survey=${survey})"/>
+                </th:block>
+                <th:block th:if="${currentPage == null}">
+                    <th:block th:replace="fragments/survey :: previewButtons(currentPage=${currentPage},currentPageNumber=${currentPageNumber},errorMessage=${errorMessage},totalPages=${totalPages},survey=${survey})"/>
+                </th:block>
+            </div>
+        </th:block>
+
+        <th:block th:if="${currentPage != null and !survey.draft}">
+            <th:block th:each="question, questionIteration : ${currentPage.getQuestions()}">
+                <th:block th:replace="fragments/survey :: editQuestionFormPart(survey=${survey},question=${question},index=${questionIteration.index},currentPage=${currentPage})"/>
+            </th:block>
+            <th:block th:replace="fragments/survey :: previewButtons(currentPage=${currentPage},currentPageNumber=${currentPageNumber},errorMessage=${errorMessage},totalPages=${totalPages},survey=${survey})"/>
+        </th:block>
+
+        <th:block th:replace="fragments/survey :: subFormDeleteSurvey(survey=${survey})" />
+    </div>
+
+    <th:block th:if="${survey.draft}">
+        <th:block th:if="${totalPages gt 0}"
+                  th:replace="fragments/survey :: subFormAddPageLeft(survey=${survey},pageNumber=${currentPageNumber})"/>
+        <th:block th:if="${totalPages gt 0}"
+                  th:replace="fragments/survey :: subFormAddPageRight(survey=${survey},pageNumber=${currentPageNumber})" />
+        <th:block th:if="${totalPages == 0}"
+                  th:replace="fragments/survey :: subFormAddInitialPage(survey=${survey})"/>
+        <th:block th:if="${currentPage}"
+                  th:replace="fragments/survey :: subFormDeletePage(survey=${survey},pageNumber=${currentPageNumber})"/>
+        <th:block th:replace="fragments/survey :: subFormPublish(survey=${survey})" />
+    </th:block>
+</main>
+<th:block th:replace="fragments/includes :: scripts"></th:block>
+</body>
+</html>

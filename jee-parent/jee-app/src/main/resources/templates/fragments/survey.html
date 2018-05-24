@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+</head>
+
+<body>
+
+<div class="card blue" id="survey-settings-fragment" th:fragment="surveySettings">
+    <div class="card-content blue lighten-1 white-text">
+        <span class="card-title">Survey settings</span>
+    </div>
+    <div class="card-content grey lighten-5">
+        <div class="row">
+            <div class="input-field col s12">
+                <input type="text" id="survey-title" class="form-control" th:field="${survey.title}"
+                       th:disabled="${!survey.draft}"
+                       placeholder="Enter survey's title here"
+                       th:maxlength="255"/>
+                <label for="survey-title">Title</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s12">
+                            <textarea id="survey-description" th:field="${survey.description}"
+                                      th:disabled="${!survey.draft}"
+                                      placeholder="Enter survey's description here"
+                                      class="materialize-textarea form-control"
+                                      th:maxlength="255">
+                            </textarea>
+                <label for="survey-description">Description</label>
+            </div>
+        </div>
+        <div class="row">
+            <th:block th:switch="${survey.draft}">
+                <div class="col s12" th:case="true">
+                    <input type="checkbox" id="survey-public-statistics" class="form-control"
+                           th:field="${survey.resultsPublic}"
+                           th:checked="${survey.resultsPublic}"/>
+                    <label for="survey-public-statistics">Public statistics</label>
+                </div>
+                <div class="col s12" th:case="false">
+                    <th:block th:switch="${survey.resultsPublic}">
+                        <em th:case="true">Results for this survey are public</em>
+                        <em th:case="false">Results for this survey are private</em>
+                    </th:block>
+                </div>
+            </th:block>
+        </div>
+        <div class="row">
+            <div class="input-field col s12">
+                <label for="survey-valid-date" class="active">Valid until</label>
+                <input type="date" id="survey-valid-date" class="datepicker form-control"
+                       th:field="${survey.validDate}"
+                       th:disabled="${!survey.draft}"
+                       placeholder="Select a date until which the survey will be open"
+                       />
+            </div>
+        </div>
+        <div class="row" th:if="${!survey.draft}">
+            <div class="col s12">
+                <p>For sharing use this url:</p>
+                <a th:href="${url}" th:text="${url}" target="_blank"></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card blue" th:fragment="surveyPaging">
+    <div class="card-content blue lighten-1 white-text center" th:if="${currentPage}">
+        <span class="card-title">Current page: <th:block th:text="${currentPageNumber}"></th:block></span>
+    </div>
+    <div class="card-content grey lighten-5">
+        <div th:if="${errorMessage}" class="card-panel red">
+            <span th:text="${errorMessage}"></span>
+        </div>
+        <div th:if="${survey}" id="survey-edit">
+            <input type="hidden" th:value="${survey.getId()}" id="survey-id" />
+            <input type="hidden" th:value="${currentPageNumber}" id="survey-current-page" />
+            <div th:if="${totalPages} &gt; 0" class="row">
+                <div class="input-field col l4 s12" th:if="${survey.draft}">
+                    <a class="submit-form-btn col s12 btn btn-large waves-effect indigo"
+                       data-formid="add-page-left-form"
+                       href="#!">ADD PAGE BEFORE</a>
+                </div>
+
+                <div class="input-field col l4 s12" th:if="${survey.draft}">
+                    <select id="edit-survey-select-page">
+                        <option th:each="i : ${#numbers.sequence(1, totalPages)}" th:text="${i}"></option>
+                    </select>
+                    <label>Go to page #:</label>
+                </div>
+
+                <div class="input-field col s12" th:if="${!survey.draft}">
+                    <select id="survey-select-page">
+                        <option th:each="i : ${#numbers.sequence(1, totalPages)}" th:text="${i}"></option>
+                    </select>
+                    <label>Go to page #:</label>
+                </div>
+
+                <div class="input-field col l4 s12" th:if="${survey.draft}">
+                    <a class="submit-form-btn col s12 btn btn-large waves-effect indigo"
+                       data-formid="add-page-right-form"
+                       href="#!">ADD PAGE AFTER</a>
+                </div>
+            </div>
+            <div class="row" th:if="${survey.draft and totalPages > 1}">
+                <div class="col s12" th:if="${currentPage}">
+                    <a class="submit-form-btn col s12 btn btn-large waves-effect red"
+                       data-formid="delete-page-form"
+                       href="#!">DELETE PAGE</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:fragment="editQuestionFormPart" class="container question-container" th:attr="data-questionid='' + ${index + 1} + ''">
+    <div class="card blue">
+        <div class="card-content blue lighten-1 white-text">
+            <span class="card-title" th:inline="text">Question #[[__${index + 1}__]]</span>
+            <a class="btn-floating halfway-fab waves-effect red delete-question"
+               th:if="${survey.draft}"
+               href="#!"
+               data-toggle="tooltip" title="Remove question">
+                <i class="material-icons">remove</i>
+            </a>
+        </div>
+        <div class="card-content grey lighten-5">
+            <div class="row">
+                <div class="col s12">
+                    <input type="hidden"
+                           th:disabled="${!survey.draft}"
+                           th:field="${currentPage.questions[__${index}__].questionType}"/>
+                    <span>Type: <em th:text="${question.questionType}">TEXT</em></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12 input-field">
+                    <label th:for="'question_' + ${index}" class="active">Question</label>
+                    <input type="text" class="form-control" th:id="'question_' + ${index}"
+                           th:disabled="${!survey.draft}"
+                           th:field="${currentPage.questions[__${index}__].question}"
+                           placeholder="Enter your question here"
+                           th:maxlength="255"/>
+                </div>
+            </div>
+            <div class="row">
+                <th:block th:switch="${survey.draft}">
+                    <div class="col s12" th:case="true">
+                        <input type="checkbox" class="form-control" th:id="'mandatory_' + ${index}"
+                               th:field="${currentPage.questions[__${index}__].mandatory}"/>
+                        <label th:for="'mandatory_' + ${index}">Mandatory</label>
+                    </div>
+                    <div class="col s12" th:case="false">
+                        <th:block th:switch="${question.mandatory}">
+                            <em th:case="true">Answering this question is mandatory</em>
+                            <em th:case="false">Answering this question is optional</em>
+                        </th:block>
+                    </div>
+                </th:block>
+            </div>
+            <div class="row" th:if="${question.questionType == T(jee.mif.model.survey.QuestionType).SCALE}">
+                <div class="col s12 input-field">
+                    <input type="number" class="form-control" th:id="'minValue_' + ${index}"
+                           th:disabled="${!survey.draft}"
+                           th:field="${currentPage.questions[__${index}__].minValue}"
+                           placeholder="Enter the minimum value here"
+                           step="0.01" min="-999999999.99" max="999999999.99"/>
+                    <label th:for="'minValue_' + ${index}" class="active">Minimum value</label>
+                </div>
+            </div>
+            <div class="row" th:if="${question.questionType == T(jee.mif.model.survey.QuestionType).SCALE}">
+                <div class="col s12 input-field">
+                    <input type="number" class="form-control" th:id="'maxValue_' + ${index}"
+                           th:disabled="${!survey.draft}"
+                           th:field="${currentPage.questions[__${index}__].maxValue}"
+                           placeholder="Enter the maximum value here"
+                           step="0.01" min="-999999999.99" max="999999999.99"/>
+                    <label th:for="'maxValue_' + ${index}" class="active">Maximum value</label>
+                </div>
+            </div>
+            <th:block th:if="${question.questionType == T(jee.mif.model.survey.QuestionType).CHECKBOX || question.questionType == T(jee.mif.model.survey.QuestionType).MULTIPLECHOICE}">
+                <div class="row option-container" th:each="option, optionIteration : ${question.chooseQuestionOptions}">
+                    <div class="col s12 input-field option-field">
+                        <label th:for="'option_' + ${index} +'_' + ${index}" class="active">Option</label>
+                        <input type="text"
+                               th:disabled="${!survey.draft}"
+                               th:id="'option_' + ${index} +'_' + ${optionIteration.index}"
+                               th:field="${currentPage.questions[__${index}__].chooseQuestionOptions[__${optionIteration.index}__].option}"
+                               th:placeholder="'Enter the question\'s option #' + ${optionIteration.index + 1} + ' here'"
+                               th:maxlength="255"
+                               class="optionField form-control"/>
+                        <a class="btn-floating halfway-fab waves-effect red remove-option-btn" href="#!" th:if="${survey.draft}"
+                           data-toggle="tooltip" title="Remove question option">
+                            <i class="material-icons">remove</i>
+                        </a>
+                    </div>
+                </div>
+            </th:block>
+            <div class="row add-option-container" th:if="${survey.draft and (question.questionType == T(jee.mif.model.survey.QuestionType).CHECKBOX || question.questionType == T(jee.mif.model.survey.QuestionType).MULTIPLECHOICE)}">
+                <div class="col s12">
+                    <a class="btn waves-effect blue add-option-btn" href="#!"
+                       th:attr="data-questionindex=${index}, data-nextoptionid=${question.chooseQuestionOptions.size()}">Add new option</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:fragment="previewButtons" id="preview-buttons-container" align="right" class="container"
+     style="margin-bottom: 10px">
+    <a class="submit-form-btn btn-floating red"
+       data-formid="delete-survey-form"
+       th:href="@{/auth/survey-edit/delete-survey(survey-id=${survey.id})}"
+       data-toggle="tooltip" title="Delete survey"
+       th:if="${canDelete}">
+        <i class="material-icons">delete</i>
+    </a>
+    <a class=" btn-floating cyan"
+       th:href="@{/statistics/{id}(id=${survey.getId()})}"
+       data-toggle="tooltip" title="Survey statistics">
+        <i class="material-icons">trending_up</i>
+    </a>
+    <a class=" btn-floating green darken-4"
+       th:href="@{/auth/survey-edit/export/survey-{survey-id}.xlsx(survey-id=${survey.id})}"
+       data-toggle="tooltip" title="Export survey">
+        <i class="material-icons">file_download</i>
+    </a>
+</div>
+
+<form th:fragment="subFormDeleteSurvey" id="delete-survey-form" class="hide" method="post" th:action="@{/auth/survey-edit/delete-survey}">
+    <input type="hidden" name="survey-id" th:value="${survey.getId()}" />
+</form>
+
+<form th:fragment="subFormAddPageLeft" id="add-page-left-form" class="hide confirm-everything" method="post" th:action="@{/auth/survey-edit/add-page-left}">
+    <input type="hidden" name="survey-id" th:value="${survey.getId()}" />
+    <input type="hidden" name="page" th:value="${pageNumber}" />
+</form>
+
+<form th:fragment="subFormAddPageRight" id="add-page-right-form" class="hide confirm-everything" method="post" th:action="@{/auth/survey-edit/add-page-right}">
+    <input type="hidden" name="survey-id" th:value="${survey.getId()}" />
+    <input type="hidden" name="page" th:value="${pageNumber}" />
+</form>
+
+<form th:fragment="subFormAddInitialPage" id="add-initial-page-form" class="hide confirm-everything" method="post" th:action="@{/auth/survey-edit/add-initial-page}">
+    <input type="hidden" name="survey-id" th:value="${survey.getId()}" />
+</form>
+
+<form th:fragment="subFormDeletePage" id="delete-page-form" class="hide confirm-header" method="post" th:action="@{/auth/survey-edit/delete-page}">
+    <input type="hidden" name="survey-id" th:value="${survey.getId()}" />
+    <input type="hidden" name="page" th:value="${pageNumber}" />
+</form>
+
+<form th:fragment="subFormPublish" id="publish-form" class="hide confirm-everything" method="post" th:action="@{/auth/survey-edit/publish}">
+    <input type="hidden" name="survey-id" th:value="${survey.getId()}" />
+</form>
+
+</body>
+
+</html>

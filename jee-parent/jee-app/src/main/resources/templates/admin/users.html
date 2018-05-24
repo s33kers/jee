@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Admin panel</title>
+        <th:block th:replace="fragments/includes :: styles"/>
+    </head>
+    <body>
+        <nav th:replace="fragments/navbar :: navigation"></nav>
+        <th:block th:replace="fragments/errors :: errorsBlock"/>
+        <main>
+            <div class="wide-card-content">
+                <div class="container">
+                    <div class="row">
+                        <div class="col s12">
+                            <div class="card-title">
+                                <h4 class="light">Users</h4>
+                                <a class="btn waves-effect blue" th:href="@{/admin/apply-new-user/}">Add new user</a>
+                            </div>
+                            <div class="card blue">
+                                <div class="card-tabs">
+                                    <ul class="tabs tabs-fixed-width tabs-transparent">
+                                        <li class="tab"><a href="#registered">Registered</a></li>
+                                        <li class="tab"><a href="#notregistered">Not registered</a></li>
+                                    </ul>
+                                </div>
+                                <div class="card-content blue lighten-4">
+                                    <div id="registered">
+                                        <table class="action-last-col responsive-table">
+                                            <thead>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Email</th>
+                                                <th>Role</th>
+                                                <th>Status</th>
+                                                <th></th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr th:each="user : ${activatedUsers}">
+                                                <td th:text="${user.name + ' ' + user.surname}"></td>
+                                                <td th:text="${user.principalEmail}"></td>
+                                                <td th:text="#{enum.label.+${user.role}}"></td>
+                                                <td>
+                                                    <th:block th:switch="${user.blocked}">
+                                                        <i th:case="true" class="round red z-depth-1">
+                                                            <i class="material-icons">block</i>
+                                                        </i>
+                                                        <i th:case="false" class="round green z-depth-1">
+                                                            <i class="material-icons">check</i>
+                                                        </i>
+                                                    </th:block>
+                                                </td>
+                                                <td>
+                                                    <a class="btn btn-floating waves-effect waves-light orange right" th:href="@{/admin/user-edit/{id}(id=${user.getId()})}"
+                                                       data-toggle="tooltip" title="Edit user">
+                                                        <i class="material-icons">edit</i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                        <div th:if="${activatedUsers.isEmpty()}" class="card-panel red">
+                                            User list is empty
+                                        </div>
+                                    </div>
+                                    <div id="notregistered">
+                                        <table class="action-last-col responsive-table">
+                                            <thead>
+                                            <tr>
+                                                <th>Email</th>
+                                                <th></th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr th:each="user : ${notActivatedUsers}">
+                                                <td th:text="${user.principalEmail}"></td>
+                                                <td>
+                                                    <form th:object="${user}" th:action="@{/admin/deleteNotActivatedUser}"
+                                                          class="right" method="post">
+                                                        <input type="hidden" th:value="*{id}" name="id"/>
+                                                        <button type="submit"
+                                                                class="btn btn-floating waves-effect waves-light red right"
+                                                                title="Delete user">
+                                                            <i class="material-icons">remove</i>
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                        <div th:if="${notActivatedUsers.isEmpty()}" class="card-panel red">
+                                            User list is empty
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <th:block th:replace="fragments/includes :: scripts"></th:block>
+</body>
+</html>

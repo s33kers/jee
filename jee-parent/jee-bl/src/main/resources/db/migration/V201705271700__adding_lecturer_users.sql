@@ -1,0 +1,3 @@
+INSERT INTO jee_user (id, version, principal_email, role) VALUES (nextval('hibernate_sequence'), 1, 'saulius.ragaisis@mif.vu.lt ', 'ROLE_ADMIN');
+INSERT INTO jee_user (id, version, principal_email, role) VALUES (nextval('hibernate_sequence'), 1, 'donatas.ciuksys@mif.vu.lt', 'ROLE_ADMIN');
+INSERT INTO jee_user (id, version, principal_email, role, hashed_password) VALUES (nextval('hibernate_sequence'), 1, 'testas@testauskas.lt', 'ROLE_USER', '$2a$10$fcuBb8dt2QAaSBNaMBCej.803fciYHhbJsicIK7NIHCHgYQLmJ91G'); --passowrd aaa

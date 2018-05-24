@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+</head>
+
+<body>
+
+    <th:block th:fragment="styles">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <link rel="stylesheet" type="text/css" th:href="@{/webjars/materializecss/0.98.0/css/materialize.min.css}" />
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+        <link rel="stylesheet" type="text/css" th:href="@{/wro/site.css}" />
+    </th:block>
+
+    <th:block th:fragment="scripts">
+        <th:block th:replace="fragments/modals :: modals"></th:block>
+
+        <script th:src="@{/webjars/jquery/3.2.0/jquery.min.js}"></script>
+        <script th:src="@{/webjars/materializecss/0.98.0/js/materialize.min.js}"></script>
+        <script th:src="@{/webjars/chartjs/2.4.0/Chart.bundle.min.js}"></script>
+        <script th:src="@{/wro/site.js}"></script>
+    </th:block>
+
+</body>
+
+</html>

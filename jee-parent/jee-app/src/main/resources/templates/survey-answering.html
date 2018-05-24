@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Survey answering</title>
+    <th:block th:replace="fragments/includes :: styles"/>
+</head>
+<body>
+<th:block th:replace="fragments/errors :: errorsBlock"/>
+<main>
+    <form class="col s12" method="post" name="survey">
+        <input type="hidden" th:field="${survey.id}" id="id" name="id"/>
+        <input type="hidden" th:field="${survey.version}" id="version" name="version"/>
+        <input type="hidden" th:field="${survey.completed}" id="completed" name="completed"/>
+        <input type="hidden" th:field="${survey.savedToken}" id="savedToken" name="savedToken"/>
+
+        <input type="hidden" th:value="1" id="survey-current-page" />
+        <input type="hidden" th:value="${totalPages}" id="survey-max-page" />
+
+        <div class="container"  name="surveyView">
+            <input type="hidden" th:field="${survey.surveyView.id}" id="id" name="id"/>
+            <input type="hidden" th:field="${survey.surveyView.urlToken}" id="urlToken" name="urlToken"/>
+
+            <div class="card blue">
+                <div class="card-content blue lighten-1 white-text center">
+                    <span class="card-title">Current page: <span id="span-current-page">1</span></span>
+                </div>
+                <div class="card-content grey lighten-5">
+                    <div class="row" th:if="${totalPages} > 1">
+                        <div class="col s6">
+                            <button name="backBtn" id="backBtn" class="col s12  btn btn-large waves-effect indigo disabled">BACK</button>
+                        </div>
+                        <div class="col s6">
+                            <button name="nextBtn" id="nextBtn" class="col s12  btn btn-large waves-effect indigo">NEXT</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div id="email-field" class="input-field col s6" style="display: none">
+                            <label for="email">Enter your email</label>
+                            <input id="email" type="email" name="email" class="validate" />
+                        </div>
+                        <div class="col s12" id="submit-email-button">
+                            <button type="submit" name="action" value="save" id="save-answer" class="col s12 btn btn-large waves-effect indigo">Save answering</button>
+                        </div>
+                    </div>
+                    <div class="row" id="submit-form" th:style="${totalPages} == 1 ? 'display: block' : 'display: none'">
+                        <div class="col s12">
+                            <button type="submit" name="action" value="submit" id="submit-answers" class="col s12 btn btn-large waves-effect red">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div th:each="pages, pageNo : ${survey.surveyView.pages}" th:id="'page-'+${pageNo.index+1}" class="page" th:style="${pageNo.index} == 0 ? 'display: block' : 'display: none'">
+                <input type="hidden" th:field="${survey.surveyView.pages[__${pageNo.index}__].id}"/>
+                <div th:each="question, questIndex : ${pages.getQuestions()}" >
+
+                    <input type="hidden" th:field="${survey.surveyView.pages[__${pageNo.index}__].questions[__${questIndex.index}__].id}"/>
+                    <input type="hidden" th:field="${survey.surveyView.pages[__${pageNo.index}__].questions[__${questIndex.index}__].mandatory}"/>
+                    <input type="hidden" th:field="${survey.surveyView.pages[__${pageNo.index}__].questions[__${questIndex.index}__].question}"/>
+                    <input type="hidden" th:field="${survey.surveyView.pages[__${pageNo.index}__].questions[__${questIndex.index}__].questionType}"/>
+                    <input type="hidden" th:field="${survey.surveyView.pages[__${pageNo.index}__].questions[__${questIndex.index}__].minValue}"/>
+                    <input type="hidden" th:field="${survey.surveyView.pages[__${pageNo.index}__].questions[__${questIndex.index}__].maxValue}"/>
+                    <input type="hidden" th:field="${survey.surveyView.pages[__${pageNo.index}__].questions[__${questIndex.index}__].answerView.id}"/>
+                    <input type="hidden" th:field="${survey.surveyView.pages[__${pageNo.index}__].questions[__${questIndex.index}__].answerView.version}"/>
+                    <div class="card blue">
+                        <div class="card-content blue lighten-1 white-text">
+                            <p>Question #<span th:text="${questIndex.index +1}"></span></p>
+                        </div>
+                        <div class="card-content grey lighten-5">
+                            <div class="row">
+                                <div class="col s12">
+                                    <span name="question" th:text="${survey.surveyView.pages[__${pageNo.index}__].questions[__${questIndex.index}__].getQuestion()}"></span> <span th:if="${question.isMandatory()}" class="red-text">*</span>
+                                </div>
+                            </div>
+
+                            <div th:switch="${question.getQuestionType()}">
+                                <div th:case="${T(jee.mif.model.survey.QuestionType).TEXT}">
+                                    <div class="row">
+                                        <div class="col s12">
+                                            <input type="text" th:field="${survey.surveyView.pages[__${pageNo.index}__].questions[__${questIndex.index}__].answerView.answer}"
+                                                   th:id="'answer_' + ${pageNo.index} + '_' + ${questIndex.index}"
+                                                   placeholder="Enter your answer here" th:maxlength="255"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div th:case="${T(jee.mif.model.survey.QuestionType).CHECKBOX}">
+                                    <div class="row" th:each="option, optIndex : ${question.chooseQuestionOptions}">
+                                        <div class="col s12">
+                                            <input type="hidden" th:field="${survey.surveyView.pages[__${pageNo.index}__].questions[__${questIndex.index}__].chooseQuestionOptions[__${optIndex.index}__].id}" />
+                                            <input type="hidden" th:field="${survey.surveyView.pages[__${pageNo.index}__].questions[__${questIndex.index}__].chooseQuestionOptions[__${optIndex.index}__].option}" />
+
+                                            <input type="checkbox" th:checked="${option.checked}"
+                                                   th:id="'coption_'+ ${pageNo.index} + '_' + ${questIndex.index} + '_' + ${optIndex.index}"
+                                                   th:field="${survey.surveyView.pages[__${pageNo.index}__].questions[__${questIndex.index}__].chooseQuestionOptions[__${optIndex.index}__].checked}" />
+                                            <label th:for="'coption_'+ ${pageNo.index} + '_' + ${questIndex.index} + '_' + ${optIndex.index}"
+                                                   th:text="${option.getOption()}" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div th:case="${T(jee.mif.model.survey.QuestionType).MULTIPLECHOICE}"  >
+                                    <th:block th:each="option, optIndex : ${question.chooseQuestionOptions}">
+                                        <div class="row">
+                                            <div class="col s12">
+                                                <input type="hidden" th:field="${survey.surveyView.pages[__${pageNo.index}__].questions[__${questIndex.index}__].chooseQuestionOptions[__${optIndex.index}__].id}" />
+                                                <input type="hidden" th:field="${survey.surveyView.pages[__${pageNo.index}__].questions[__${questIndex.index}__].chooseQuestionOptions[__${optIndex.index}__].option}" />
+
+                                                <input type="radio" th:value="${option.getOption()}"
+                                                       th:id="'roption_'+ ${pageNo.index} + '_' + ${questIndex.index} + '_' + ${optIndex.index}"
+                                                       th:field="*{survey.surveyView.pages[__${pageNo.index}__].questions[__${questIndex.index}__].answerView.selected}"/>
+                                                <label th:for="'roption_'+ ${pageNo.index} + '_' + ${questIndex.index} + '_' + ${optIndex.index}"
+                                                       th:text="${option.getOption()}"/>
+                                            </div>
+                                        </div>
+                                    </th:block>
+                                </div>
+                                <div th:case="${T(jee.mif.model.survey.QuestionType).SCALE}">
+                                    <div class="row">
+                                        <div class="col s12">
+                                            <input type="number" th:id="'answer_' + ${pageNo.index} + '_' + ${questIndex.index}"
+                                                   th:attr="data-pageid='' + ${pageNo.index + 1} + ''"
+                                                   th:min="${question.getMinValue()}" th:max="${question.getMaxValue()}"
+                                                   th:step="0.01"
+                                                   th:field="${survey.surveyView.pages[__${pageNo.index}__].questions[__${questIndex.index}__].answerView.answer}"/>
+                                            <label th:for="'answer_' + ${pageNo.index} + '_' + ${questIndex.index}" th:text="'(min '+${question.getMinValue()}+', max '+${question.getMaxValue()}+')'"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="fixed-action-btn ">
+                <a class="btn-floating indigo" id="up-btn" href="#!"
+                   data-toggle="tooltip" title="Scroll to the top">
+                    <i class="material-icons">arrow_upward</i>
+                </a>
+            </div>
+        </div>
+    </form>
+</main>
+
+<th:block th:replace="fragments/includes :: scripts"></th:block>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Denied</title>
+    <th:block th:replace="fragments/includes :: styles"/>
+</head>
+<body>
+<div class="medium-card-content">
+    <div class="form-card">
+        <div class="card red">
+            <div class="card-content red lighten-1 white-text center">
+                <span class="card-title">Sorry! Access denied</span>
+            </div>
+            <div class="card-content red lighten-5 center">
+                <span>You don't have permission to open this page.</span>
+            </div>
+        </div>
+    </div>
+</div>
+<th:block th:replace="fragments/includes :: scripts"></th:block>
+</body>
+</html>

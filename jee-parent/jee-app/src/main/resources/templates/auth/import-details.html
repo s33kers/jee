@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Import survey</title>
+    <th:block th:replace="fragments/includes :: styles"/>
+</head>
+<body>
+<nav th:replace="fragments/navbar :: navigation"></nav>
+<th:block th:replace="fragments/errors :: errorsBlock"/>
+<main>
+    <div class="medium-card-content" th:if="${importDetails}">
+        <h2 class="center-align grey-text">Import details</h2>
+        <div class="form-card center">
+            <div class="z-depth-1 grey lighten-4 row form-container">
+                <div class="card-panel red">
+                    <span th:utext="${importDetails}"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="medium-card-content">
+        <h2 class="center-align grey-text">Re-Import XLSX</h2>
+        <div class="form-card">
+            <div class="z-depth-1 grey lighten-4 row form-container">
+                <form class="col s12 row" method="post" enctype="multipart/form-data" th:action="@{/auth/import-details/upload(survey-id=${surveyId})}">
+                    <input type="hidden" th:field="${surveyId}" id="id" name="id"/>
+                    <div class="file-field input-field col s12">
+                        <div class="btn">
+                            <span>Choose file</span>
+                            <input name="file" type="file" />
+                        </div>
+                        <div class="file-path-wrapper">
+                            <input class="file-path validate" name="file-path" type="text" />
+                        </div>
+                    </div>
+                    <button type="submit" name="btn_import" class="col s12 btn btn-large waves-effect indigo">Import</button>
+                </form>
+                <form class="col s12 row" method="post" enctype="multipart/form-data" th:action="@{/auth/import-details/delete-import(survey-id=${surveyId})}">
+                    <input type="hidden" th:field="${surveyId}" id="survey-id" name="survey-id"/>
+                    <button  type="submit" name="btn_import" class="col s12 btn btn-large waves-effect red">Delete import</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+<th:block th:replace="fragments/includes :: scripts"></th:block>
+</body>
+</html>

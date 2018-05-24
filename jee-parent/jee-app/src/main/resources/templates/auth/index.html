@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Surveys management</title>
+        <th:block th:replace="fragments/includes :: styles"/>
+    </head>
+    <body>
+    <nav th:replace="fragments/navbar :: navigation"></nav>
+    <th:block th:replace="fragments/errors :: errorsBlock"/>
+    <main>
+        <div class="wide-card-content">
+            <div class="container">
+                <div class="row">
+                    <div class="col s12">
+                        <div class="card-title">
+                            <h4 class="light">Surveys</h4>
+                            <a class="btn waves-effect blue" th:href="@{/auth/survey-edit/new}">Create new survey</a>
+                            <a class="btn waves-effect blue" th:href="@{/auth/import-survey}">Import from XLSX</a>
+                        </div>
+                        <div class="card blue">
+                            <div class="card-content blue lighten-4">
+                                <div id="all-surveys">
+                                    <div th:if="${not #lists.isEmpty(allSurveys)}">
+                                        <table class="action-last-col responsive-table">
+                                            <thead>
+                                            <tr>
+                                                <th>Title</th>
+                                                <th>Created</th>
+                                                <th>Created by</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr th:each="survey : ${allSurveys}">
+                                                <td th:text="${survey.getTitle()}"></td>
+                                                <td th:text="${#temporals.format(survey.getCreationDate(), 'yyyy-MM-dd HH:mm:ss')}"></td>
+                                                <td th:text="${survey.getUser()}"></td>
+                                                <!--Draft-->
+                                                <td th:if="${survey.isDraft() and !survey.isUploaded() and !survey.isUploading()}">
+                                                    <a class="btn btn-floating waves-effect waves-light orange right" th:href="@{/auth/survey-edit/{surveyId}(surveyId=${survey.getId()})}"
+                                                       data-toggle="tooltip" title="Edit survey">
+                                                        <i class="material-icons">edit</i>
+                                                    </a>
+                                                </td>
+                                                <!--Published or Imported successfully-->
+                                                <td th:if="${!survey.isDraft() and !survey.isUploading()}">
+                                                    <a class="btn btn-floating waves-effect waves-light green right" th:href="@{/auth/survey-edit/preview/{surveyId}(surveyId=${survey.getId()})}"
+                                                       data-toggle="tooltip" title="Preview survey">
+                                                        <i class="material-icons">pageview</i>
+                                                    </a>
+                                                </td>
+                                                <!--Uploading-->
+                                                <td th:if="${survey.isUploading()}">
+                                                    <a class="btn btn-floating waves-effect waves-light yellow right" th:href="@{/auth}"
+                                                       data-toggle="tooltip" title="Still uploading. Refresh">
+                                                        <i class="material-icons">autorenew</i>
+                                                    </a>
+                                                </td>
+                                                <!--Import failed-->
+                                                <td th:if="${survey.isDraft() and survey.isUploaded() and !survey.isUploading()}">
+                                                    <a class="btn btn-floating waves-effect waves-light red right" th:href="@{/auth/import-details/{id}(id=${survey.getId()})}"
+                                                       data-toggle="tooltip" title="Import details">
+                                                        <i class="material-icons">error</i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div th:if="${#lists.isEmpty(allSurveys)}" class="card-panel red">
+                                        There are no surveys.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <th:block th:replace="fragments/includes :: scripts"></th:block>
+</body>
+</html>
